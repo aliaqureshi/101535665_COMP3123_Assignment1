@@ -3,7 +3,8 @@ const express = require("express");
 const {
   createEmployee,
   getAllEmployees,
-  getEmployeeById
+  getEmployeeById,
+  updateEmployee
 } = require("../controllers/employeeController");
 
 const protect = require("../middleware/authMiddleware");
@@ -15,7 +16,11 @@ const {
 
 const router = express.Router();
 
-router.get("/employees", protect, getAllEmployees);
+router.get(
+  "/employees",
+  protect,
+  getAllEmployees
+);
 
 router.post(
   "/employees",
@@ -29,6 +34,14 @@ router.get(
   protect,
   employeeIdParamValidator,
   getEmployeeById
+);
+
+router.put(
+  "/employees/:eid",
+  protect,
+  employeeIdParamValidator,
+  employeeValidator,
+  updateEmployee
 );
 
 module.exports = router;

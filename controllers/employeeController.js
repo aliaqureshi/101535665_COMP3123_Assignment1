@@ -108,8 +108,73 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
+const updateEmployee = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array()
+      });
+    }
+
+    const {
+      first_name,
+      last_name,
+      email,
+      position,
+      salary,
+      date_of_joining,
+      department
+    } = req.body;
+
+    const employee = await Employee.findOneAndUpdate(
+      {
+        _id: req.params.eid,
+        user: req.user.id
+      },
+      {
+        first_name,
+        last_name,
+        email,
+        position,
+        salary,
+        date_of_joining,
+        department
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Employee updated successfully",
+      employee
+    });
+  } catch (error) {
+    console.error("Update employee error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
+
 module.exports = {
   createEmployee,
   getAllEmployees,
-  getEmployeeById
+  getEmployeeById,
+  updateEmployee
 };
