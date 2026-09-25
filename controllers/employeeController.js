@@ -49,6 +49,28 @@ const createEmployee = async (req, res) => {
   }
 };
 
+const getAllEmployees = async (req, res) => {
+  try {
+    const employees = await Employee.find({
+      user: req.user.id
+    }).sort({ created_at: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: employees.length,
+      employees
+    });
+  } catch (error) {
+    console.error("Get employees error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
+
 module.exports = {
-  createEmployee
-}; 
+  createEmployee,
+  getAllEmployees
+};
