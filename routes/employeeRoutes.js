@@ -4,14 +4,16 @@ const {
   createEmployee,
   getAllEmployees,
   getEmployeeById,
-  updateEmployee
+  updateEmployee,
+  deleteEmployee
 } = require("../controllers/employeeController");
 
 const protect = require("../middleware/authMiddleware");
 
 const {
   employeeValidator,
-  employeeIdParamValidator
+  employeeIdParamValidator,
+  employeeIdQueryValidator
 } = require("../validators/employeeValidator");
 
 const router = express.Router();
@@ -42,6 +44,13 @@ router.put(
   employeeIdParamValidator,
   employeeValidator,
   updateEmployee
+);
+
+router.delete(
+  "/employees",
+  protect,
+  employeeIdQueryValidator,
+  deleteEmployee
 );
 
 module.exports = router;
