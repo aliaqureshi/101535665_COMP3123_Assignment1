@@ -70,7 +70,46 @@ const getAllEmployees = async (req, res) => {
   }
 };
 
+const getEmployeeById = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array()
+      });
+    }
+
+    const employee = await Employee.findOne({
+      _id: req.params.eid,
+      user: req.user.id
+    });
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      employee
+    });
+  } catch (error) {
+    console.error("Get employee by ID error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
+
 module.exports = {
   createEmployee,
-  getAllEmployees
+  getAllEmployees,
+  getEmployeeById
 };
