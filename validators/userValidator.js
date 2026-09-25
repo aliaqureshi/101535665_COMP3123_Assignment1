@@ -29,6 +29,18 @@ const signupValidator = [
     .withMessage("Password must contain at least one number")
 ];
 
+const loginValidator = [
+  body("login")
+    .trim()
+    .notEmpty()
+    .withMessage("Username or email is required"),
+
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required")
+];
+
 module.exports = {
-  signupValidator
+  signupValidator,
+  loginValidator
 };
