@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
+const userRoutes = require("./routes/userRoutes");
 
 dotenv.config();
 
@@ -30,6 +31,9 @@ app.get("/health", (req, res) => {
     message: "API is running"
   });
 });
+
+// User routes
+app.use("/api/v1/user", userRoutes);
 
 // Start server
 app.listen(PORT, () => {
