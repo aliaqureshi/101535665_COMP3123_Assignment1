@@ -1,4 +1,5 @@
 const express = require("express");
+
 const {
   signup,
   login
@@ -9,9 +10,22 @@ const {
   loginValidator
 } = require("../validators/userValidator");
 
+const { authLimiter } = require("../middleware/rateLimiter");
+
 const router = express.Router();
 
-router.post("/signup", signupValidator, signup);
-router.post("/login", loginValidator, login);
+router.post(
+  "/signup",
+  authLimiter,
+  signupValidator,
+  signup
+);
+
+router.post(
+  "/login",
+  authLimiter,
+  loginValidator,
+  login
+);
 
 module.exports = router;
