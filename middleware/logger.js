@@ -4,8 +4,11 @@ const path = require("path");
 const logsDirectory = path.join(__dirname, "../logs");
 const logFile = path.join(logsDirectory, "app.log");
 
-// Create logs directory if it does not exist
-if (!fs.existsSync(logsDirectory)) {
+// Vercel has a read-only application filesystem.
+// File logging is used locally; Vercel uses console logging.
+const isVercel = process.env.VERCEL === "1";
+
+if (!isVercel && !fs.existsSync(logsDirectory)) {
   fs.mkdirSync(logsDirectory, { recursive: true });
 }
 
@@ -20,19 +23,17 @@ const logger = (req, res, next) => {
       `[${timestamp}] ${req.method} ${req.originalUrl} ` +
       `Status: ${res.statusCode} Duration: ${duration}ms`;
 
-    // Display log in Terminal
+    // Always log to console
     console.log(logEntry);
 
-    // Save log to file
-    fs.appendFile(
-      logFile,
-      logEntry + "\n",
-      (error) => {
+    // Save logs to a file only when running locally
+    if (!isVercel) {
+      fs.appendFile(logFile, logEntry + "\n", (error) => {
         if (error) {
           console.error("Logging error:", error.message);
         }
-      }
-    );
+      });
+    }
   });
 
   next();
