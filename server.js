@@ -6,6 +6,10 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
 const logger = require("./middleware/logger");
+const {
+  notFound,
+  errorHandler
+} = require("./middleware/errorMiddleware");
 
 dotenv.config();
 
@@ -47,6 +51,12 @@ app.use("/api/v1/user", userRoutes);
 
 // Employee routes
 app.use("/api/v1/emp", employeeRoutes);
+
+// Handle unsupported routes
+app.use(notFound);
+
+// Centralized error handler
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
