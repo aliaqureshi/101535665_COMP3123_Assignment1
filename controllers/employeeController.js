@@ -82,15 +82,19 @@ const getEmployeeById = async (req, res) => {
       });
     }
 
-    const employee = await Employee.findOne({
-      _id: req.params.eid,
-      user: req.user.id
-    });
+    const employee = await Employee.findById(req.params.eid);
 
     if (!employee) {
       return res.status(404).json({
         success: false,
         message: "Employee not found"
+      });
+    }
+
+    if (employee.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You do not have access to this employee"
       });
     }
 
@@ -120,6 +124,22 @@ const updateEmployee = async (req, res) => {
       });
     }
 
+    const employee = await Employee.findById(req.params.eid);
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found"
+      });
+    }
+
+    if (employee.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You do not have access to this employee"
+      });
+    }
+
     const {
       first_name,
       last_name,
@@ -130,32 +150,15 @@ const updateEmployee = async (req, res) => {
       department
     } = req.body;
 
-    const employee = await Employee.findOneAndUpdate(
-      {
-        _id: req.params.eid,
-        user: req.user.id
-      },
-      {
-        first_name,
-        last_name,
-        email,
-        position,
-        salary,
-        date_of_joining,
-        department
-      },
-      {
-        new: true,
-        runValidators: true
-      }
-    );
+    employee.first_name = first_name;
+    employee.last_name = last_name;
+    employee.email = email;
+    employee.position = position;
+    employee.salary = salary;
+    employee.date_of_joining = date_of_joining;
+    employee.department = department;
 
-    if (!employee) {
-      return res.status(404).json({
-        success: false,
-        message: "Employee not found"
-      });
-    }
+    await employee.save();
 
     return res.status(200).json({
       success: true,
@@ -184,10 +187,7 @@ const deleteEmployee = async (req, res) => {
       });
     }
 
-    const employee = await Employee.findOneAndDelete({
-      _id: req.query.eid,
-      user: req.user.id
-    });
+    const employee = await Employee.findById(req.query.eid);
 
     if (!employee) {
       return res.status(404).json({
@@ -195,6 +195,15 @@ const deleteEmployee = async (req, res) => {
         message: "Employee not found"
       });
     }
+
+    if (employee.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You do not have access to this employee"
+      });
+    }
+
+    await employee.deleteOne();
 
     return res.status(204).send();
   } catch (error) {
