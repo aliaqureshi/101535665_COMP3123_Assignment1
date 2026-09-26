@@ -1,9 +1,11 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const helmet = require("helmet");
+
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
-const helmet = require("helmet");
+const logger = require("./middleware/logger");
 
 dotenv.config();
 
@@ -14,11 +16,13 @@ const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 connectDB();
 
-// Middleware
 // Security middleware
 app.use(helmet());
 
-// Middleware
+// Request logging middleware
+app.use(logger);
+
+// Body parsing middleware
 app.use(express.json());
 
 // Root route
